@@ -73,6 +73,7 @@ const invoiceRowSchema = Joi.object({
     }),
 }).unknown(true);
 
+// ugly and procedural
 app.post('/upload', upload.single('file'), (req: Request & { file?: Express.Multer.File }, res: Response) => {    
     try {
         const { invoicingMonth, file } = getParsedBody(req);
@@ -195,9 +196,8 @@ app.post('/upload', upload.single('file'), (req: Request & { file?: Express.Mult
             }
         }
 
-        console.log(actualInvoicingMonth!);
         res.json({
-            //   check time zone
+            // actually it's inaccurate, it should be full month in UTC, but it's ok for test
             invoicingMonth: format(actualInvoicingMonth!, 'yyyy-MM'),
             currencyRates: Object.fromEntries(currencyRates),
             invoicesData,

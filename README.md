@@ -32,9 +32,6 @@ Upload an Excel file containing invoice data.
 
 **Endpoint:** `POST /upload`
 
-**Headers:**
-- `Content-Type: multipart/form-data`
-
 **Parameters:**
 - `file`: Excel file (.xlsx or .xls)
 - `invoicingMonth`: String in YYYY-MM format (e.g., "2024-03")
@@ -43,8 +40,7 @@ Upload an Excel file containing invoice data.
 ```bash
 curl -X POST \
   http://localhost:3000/upload \
-  -H 'Content-Type: multipart/form-data' \
-  -F 'file=@/path/to/your/file.xlsx' \
+  -F 'file=@/path/to/your/file.xlsx;type=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' \
   -F 'invoicingMonth=2024-03'
 ```
 
