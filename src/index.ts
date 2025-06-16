@@ -87,6 +87,8 @@ app.post('/upload', upload.single('file'), (req: Request & { file?: Express.Mult
         let currentStage = InvoiceParsingStage.INVOICING_MONTH;
         let actualInvoicingMonth: Date;
 
+        let invoiceTotal = 0;
+
         let dataColumns: string[] = [];
 
         const currencyRates = new Map<string, number>();
@@ -162,12 +164,11 @@ app.post('/upload', upload.single('file'), (req: Request & { file?: Express.Mult
                 }
 
                 const rawItem: Record<string, any> = {
-                    'Invoice Total': null,
                     validationErrors: [],
                 };
 
                 dataColumns.forEach((column, index) => {
-                    rawItem[column] = row[index];
+                    rawItem[column] = row[index] ?? '';
                 });
 
                 const rowValidationErrors = invoiceRowSchema.validate(rawItem, { abortEarly: false });
@@ -189,7 +190,7 @@ app.post('/upload', upload.single('file'), (req: Request & { file?: Express.Mult
                 if (invoicesTotalResult.errors.length) {
                     rawItem.validationErrors.push(...invoicesTotalResult.errors);
                 } else {
-                    rawItem['Invoice Total'] = invoicesTotalResult.value;
+                    invoiceTotal += invoicesTotalResult.value!;
                 }
 
                 invoicesData.push(rawItem);
@@ -198,7 +199,8 @@ app.post('/upload', upload.single('file'), (req: Request & { file?: Express.Mult
 
         res.json({
             // actually it's inaccurate, it should be full month in UTC, but it's ok for test
-            invoicingMonth: format(actualInvoicingMonth!, 'yyyy-MM'),
+            InvoicingMonth: format(actualInvoicingMonth!, 'yyyy-MM'),
+            'Invoice Total': invoiceTotal,
             currencyRates: Object.fromEntries(currencyRates),
             invoicesData,
         });
